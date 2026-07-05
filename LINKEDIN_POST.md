@@ -6,8 +6,9 @@ I rebuilt a loan-risk ML project into a full FinTech-style product with:
 
 - FastAPI backend with JWT auth, customer management, prediction history, dashboard APIs, PDF/Excel reports, and Power BI integration hooks
 - Next.js + TypeScript + Tailwind frontend with a modern responsive risk-assessment workflow
+- Responsive layout verified for desktop, mobile, and iPad/tablet screens
 - React Native/Expo mobile starter connected to the same API
-- Scikit-learn/CatBoost training pipeline with explainable outputs and a strict 95% model quality gate
+- Scikit-learn/CatBoost training pipeline with explainable outputs and quality-gated model promotion
 - Docker, CI, and local production run scripts
 
 The system returns default probability, risk score, confidence, recommendation, and key risk drivers for each loan application.

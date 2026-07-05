@@ -2,6 +2,8 @@
 
 Enterprise loan-default intelligence platform built with FastAPI, PostgreSQL, Next.js, TypeScript, Tailwind, React Native/Expo, scikit-learn, and Power BI push integration.
 
+The web app is responsive and usable across desktop, iPad/tablet, and mobile browser viewports.
+
 ## One-command local start
 
 ```bash
