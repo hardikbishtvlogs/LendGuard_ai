@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: lendguard-ai-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MODEL_PATH
+        value: /ml/artifacts/model.joblib
+      - key: CORS_ORIGINS
+        value: https://lendguard-ai-web.onrender.com
+      - key: POWERBI_PUSH_URL
+        value: ""
+      - key: POWERBI_EMBED_URL
+        value: ""
+
+  - type: web
+    name: lendguard-ai-web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://lendguard-ai-api.onrender.com

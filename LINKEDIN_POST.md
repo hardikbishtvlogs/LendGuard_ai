@@ -13,6 +13,7 @@ I rebuilt a loan-risk ML project into a full FinTech-style product with:
 
 The system returns default probability, risk score, confidence, recommendation, and key risk drivers for each loan application.
 
+Live demo: https://lendguard-ai-web.onrender.com
 GitHub: https://github.com/hardikbishtvlogs/LendGuard_ai
 
 #AI #MachineLearning #FinTech #FastAPI #NextJS #DataScience #MLOps #PortfolioProject
