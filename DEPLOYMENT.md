@@ -4,7 +4,7 @@
 
 ```bash
 cd "/Users/hardikbisht/Documents/LOAN"
-git remote add origin https://github.com/YOUR_USERNAME/secure-loan-risk-ai.git
+git remote add origin https://github.com/hardikbishtvlogs/LendGuard_ai.git
 git branch -M main
 git push -u origin main
 ```
@@ -12,7 +12,7 @@ git push -u origin main
 If the remote already exists, use:
 
 ```bash
-git remote set-url origin https://github.com/YOUR_USERNAME/secure-loan-risk-ai.git
+git remote set-url origin https://github.com/hardikbishtvlogs/LendGuard_ai.git
 git push -u origin main
 ```
 
