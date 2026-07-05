@@ -1,0 +1,1 @@
+import {InfoPage} from "@/components/InfoPage";export default function Page(){return <InfoPage eyebrow="PLATFORM" title="Every signal your lending team needs." copy="From application intake to portfolio analytics, one connected risk workspace." items={["Explainable scoring","Live analytics","Automated reporting"]}/>}

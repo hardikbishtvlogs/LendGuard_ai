@@ -1,0 +1,1 @@
+import {InfoPage} from "@/components/InfoPage";export default function Page(){return <InfoPage eyebrow="SERVICES" title="Risk infrastructure that grows with you." copy="Deploy configurable underwriting intelligence across teams, channels and portfolios." items={["Risk assessment","Portfolio monitoring","BI integration"]}/>}

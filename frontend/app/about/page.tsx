@@ -1,0 +1,1 @@
+import {InfoPage} from "@/components/InfoPage";export default function Page(){return <InfoPage eyebrow="OUR MISSION" title="Better credit decisions, made responsibly." copy="LendGuard combines transparent machine learning with disciplined lending workflows." items={["Responsible AI","Human oversight","Measurable outcomes"]}/>}

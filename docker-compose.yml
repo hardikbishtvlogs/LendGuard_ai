@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: lendguard
+      POSTGRES_USER: lendguard
+      POSTGRES_PASSWORD: lendguard
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U lendguard"], interval: 5s, timeout: 3s, retries: 10}
+  backend:
+    build: {context: ., dockerfile: backend/Dockerfile}
+    environment:
+      DATABASE_URL: postgresql://lendguard:lendguard@db:5432/lendguard
+      SECRET_KEY: ${SECRET_KEY:-development-secret-change-before-production}
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3100,http://127.0.0.1:3100
+      POWERBI_PUSH_URL: ${POWERBI_PUSH_URL:-}
+      POWERBI_EMBED_URL: ${POWERBI_EMBED_URL:-}
+    ports: ["8000:8000"]
+    depends_on: {db: {condition: service_healthy}}
+  frontend:
+    build: {context: ., dockerfile: frontend/Dockerfile}
+    environment: {NEXT_PUBLIC_API_URL: "http://localhost:8000"}
+    ports: ["3000:3000"]
+    depends_on: [backend]
+volumes: {postgres_data: {}}

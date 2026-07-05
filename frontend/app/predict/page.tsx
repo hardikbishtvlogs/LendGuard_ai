@@ -1,0 +1,32 @@
+"use client";
+import {FormEvent,useState} from "react";
+import {Activity,ArrowRight,CheckCircle2,LockKeyhole,ShieldAlert} from "lucide-react";
+import {api} from "@/lib/api";
+
+const initial={age:30,income:72000,employment_length:5,loan_amount:15000,interest_rate:11.5,credit_history_length:8,home_ownership:"MORTGAGE",loan_intent:"PERSONAL",loan_grade:"B",previous_default:"N"};
+type Form=typeof initial;
+
+export default function Predict(){
+ const [form,setForm]=useState<Form>(initial),[result,setResult]=useState<any>(),[error,setError]=useState(""),[loading,setLoading]=useState(false);
+ async function submit(e:FormEvent){e.preventDefault();setError("");setLoading(true);try{const signedIn=Boolean(localStorage.getItem("token"));setResult(await api(signedIn?"/api/v1/predictions":"/api/v1/predictions/demo",{method:"POST",body:JSON.stringify(form)}))}catch(x:any){setError(x.message)}finally{setLoading(false)}}
+ const riskColor=result?.risk_category==="high"?"text-rose-400":result?.risk_category==="medium"?"text-amber-300":"text-emerald-400";
+ return <main className="mx-auto max-w-6xl px-5 py-10 md:py-14">
+  <header className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><p className="eyebrow">RISK ASSESSMENT</p><h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Evaluate an application</h1><p className="muted mt-2">A clear, explainable decision in seconds.</p></div><div className="flex items-center gap-2 text-xs text-slate-500"><LockKeyhole size={14}/><span>Encrypted · 95% model gate</span></div></header>
+  <div className="grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
+   <form onSubmit={submit} className="panel p-5 md:p-7"><div className="mb-6 flex items-center justify-between border-b border-white/[.08] pb-4"><div><h2 className="font-semibold">Applicant details</h2><p className="mt-1 text-xs text-slate-500">All fields are required</p></div><span className="rounded-full bg-white/[.06] px-3 py-1 text-xs text-slate-400">10 signals</span></div>
+    <div className="grid gap-x-4 gap-y-5 md:grid-cols-2">
+     {[["age","Age","30"],["income","Annual income","72000"],["employment_length","Employment length","5 years"],["loan_amount","Loan amount","15000"],["interest_rate","Interest rate","11.5%"],["credit_history_length","Credit history","8 years"]].map(([k,l,h])=><Field key={k} label={l} hint={h} value={(form as any)[k]} onChange={v=>setForm({...form,[k]:v})}/>) }
+     <Select label="Home ownership" value={form.home_ownership} values={["RENT","OWN","MORTGAGE","OTHER"]} onChange={v=>setForm({...form,home_ownership:v})}/>
+     <Select label="Loan purpose" value={form.loan_intent} values={["EDUCATION","MEDICAL","VENTURE","PERSONAL","HOMEIMPROVEMENT","DEBTCONSOLIDATION"]} onChange={v=>setForm({...form,loan_intent:v})}/>
+     <Select label="Loan grade" value={form.loan_grade} values={["A","B","C","D","E","F","G"]} onChange={v=>setForm({...form,loan_grade:v})}/>
+     <Select label="Previous default" value={form.previous_default} values={["N","Y"]} onChange={v=>setForm({...form,previous_default:v})}/>
+    </div>{error&&<div className="mt-5 flex gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-sm text-rose-300"><ShieldAlert size={18}/>{error}</div>}
+    <button disabled={loading} className="button mt-6 flex w-full items-center justify-center gap-2 disabled:opacity-50">{loading?<><Activity className="animate-spin" size={18}/>Analyzing…</>:<>Analyze risk <ArrowRight size={18}/></>}</button>
+   </form>
+   <aside className="panel min-h-[520px] p-6 md:p-7">{result?<><div className="flex items-start justify-between"><div><p className="text-xs text-slate-500">DEFAULT PROBABILITY</p><div className="mt-2 text-5xl font-bold tracking-tight">{(result.default_probability*100).toFixed(1)}<span className="text-2xl text-slate-500">%</span></div></div><span className={`rounded-full bg-white/[.06] px-3 py-1 text-sm font-semibold uppercase ${riskColor}`}>{result.risk_category} risk</span></div><div className="my-7 h-2 overflow-hidden rounded-full bg-white/[.07]"><div className="h-full rounded-full bg-gradient-to-r from-cyan via-violet to-rose-400 transition-all" style={{width:`${result.default_probability*100}%`}}/></div><div className="grid grid-cols-3 gap-2"><Metric l="Score" v={result.risk_score}/><Metric l="Confidence" v={`${result.confidence}%`}/><Metric l="Decision" v={result.decision.replace('_',' ')}/></div><div className="mt-6 border-t border-white/[.08] pt-5"><p className="text-xs font-bold tracking-wider text-slate-500">RECOMMENDATION</p><p className="mt-3 text-lg font-medium">{result.recommendation}</p></div><div className="mt-6 space-y-2">{result.explanation.top_drivers.map((d:any)=><div key={d.factor} className="flex items-center gap-3 rounded-xl bg-white/[.035] p-3 text-sm"><CheckCircle2 className="text-cyan" size={17}/><div><p className="font-medium capitalize">{d.factor.replaceAll('_',' ')}</p><p className="text-xs text-slate-500">{d.impact}</p></div></div>)}</div></>:<div className="flex h-full min-h-[460px] flex-col items-center justify-center text-center"><div className="grid h-14 w-14 place-items-center rounded-2xl border border-cyan/20 bg-cyan/[.07] text-cyan"><Activity/></div><h2 className="mt-5 text-lg font-semibold">Ready to analyze</h2><p className="muted mt-2 max-w-xs text-sm leading-6">Enter applicant details. The model returns probability, risk level, confidence and key drivers.</p></div>}</aside>
+  </div>
+ </main>
+}
+function Field({label,hint,value,onChange}:{label:string,hint:string,value:number,onChange:(v:number)=>void}){return <label className="text-sm text-slate-300">{label}<input aria-label={label} className="field mt-2" type="number" step="any" placeholder={hint} value={value} onChange={e=>onChange(+e.target.value)} required/></label>}
+function Select({label,value,values,onChange}:{label:string,value:string,values:string[],onChange:(v:any)=>void}){return <label className="text-sm text-slate-300">{label}<select aria-label={label} className="field mt-2" value={value} onChange={e=>onChange(e.target.value)}>{values.map(v=><option key={v}>{v}</option>)}</select></label>}
+function Metric({l,v}:{l:string,v:any}){return <div className="rounded-xl border border-white/[.07] bg-white/[.025] p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">{l}</p><p className="mt-1 truncate text-sm font-semibold capitalize">{v}</p></div>}

@@ -1,0 +1,1 @@
+import {InfoPage} from "@/components/InfoPage";export default function Page(){return <InfoPage eyebrow="ADMIN" title="Platform operations." copy="Manage access, audit risk decisions and monitor platform health." items={["User management","Audit history","System health"]}/>}
