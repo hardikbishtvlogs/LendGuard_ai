@@ -29,6 +29,17 @@ After deployment, share the web app URL with anyone. They do not need to be on t
 
 Note: the Render free plan can sleep after inactivity, so the first request after a pause may take a little longer.
 
+## Temporary Public Link From Your Laptop
+
+For a quick shareable link without same Wi-Fi:
+
+```bash
+cd "/Users/hardikbisht/Documents/LOAN"
+./run-public-tunnel.sh
+```
+
+Copy the printed `https://...trycloudflare.com` URL and send it to anyone. Keep the terminal open while people are using it. If the laptop sleeps, shuts down, or the terminal is closed, the temporary link stops working.
+
 If the remote already exists, use:
 
 ```bash
