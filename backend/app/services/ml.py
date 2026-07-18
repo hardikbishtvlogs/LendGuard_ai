@@ -29,7 +29,10 @@ def predict(data) -> dict:
         "cb_person_cred_hist_length": data.credit_history_length,
     }])
     probability = float(bundle["pipeline"].predict_proba(row)[0, 1])
-    risk = "high" if probability >= .65 else "medium" if probability >= .35 else "low"
+    thresholds = bundle.get("decision_thresholds", {"low": .35, "high": .65})
+    low_threshold = thresholds.get("low") or .35
+    high_threshold = thresholds.get("high") or .65
+    risk = "high" if probability >= high_threshold else "medium" if probability > low_threshold else "low"
     decision = "reject" if risk == "high" else "manual_review" if risk == "medium" else "approve"
     confidence = max(probability, 1 - probability)
     drivers = []
@@ -42,4 +45,3 @@ def predict(data) -> dict:
     return {"default_probability": round(probability, 6), "risk_score": round(probability * 1000),
             "confidence": round(confidence * 100, 2), "risk_category": risk,
             "recommendation": recommendation, "explanation": {"top_drivers": drivers}, "decision": decision}
-

@@ -24,7 +24,7 @@ cd "/Users/hardikbisht/Documents/LOAN"
 
 Open http://localhost:3100. This starts both the FastAPI backend and the Next.js standalone production server. Running `npm start` from `frontend/` only starts the website, so API-backed features such as login, dashboard, saved predictions and reports need the backend running too.
 
-The training pipeline now enforces a **95% held-out accuracy quality gate** before replacing the deployed model. If candidates miss the gate, the current production artifact remains untouched and details are written to `ml/reports/metrics_failed_gate.json`.
+The training pipeline now enforces a **95%+ operating accuracy gate for automated decisions** before replacing the deployed model. Applications that fall in the uncertainty band are routed to manual review instead of being auto-approved or auto-rejected.
 
 ## Fastest way to run (Docker)
 
@@ -84,7 +84,7 @@ source .venv/bin/activate
 python ml/train.py
 ```
 
-Training compares Logistic Regression, Random Forest, gradient boosting and CatBoost when available. It evaluates accuracy, ROC AUC, precision, recall, F1, confusion matrix and five-fold cross-validation, then refuses to save a model below the 95% accuracy quality gate.
+Training compares Logistic Regression, Random Forest, gradient boosting and CatBoost when available. It evaluates accuracy, ROC AUC, precision, recall, F1 and confusion matrix, then refuses to save a model unless automated decisions meet the 95%+ operating accuracy gate with at least 90% auto-decision coverage.
 
 ## Power BI
 

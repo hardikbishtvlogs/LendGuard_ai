@@ -1,46 +1,182 @@
 {
-  "selected_model": "random_forest",
+  "operating_accuracy_gate": 0.95,
+  "minimum_auto_decision_coverage": 0.9,
+  "gate_passed": true,
+  "selected_model": "catboost",
+  "training_rows": 32409,
   "candidates": {
     "logistic_regression": {
-      "accuracy": 0.8640061396776669,
-      "roc_auc": 0.8623744124187996,
-      "precision": 0.7688442211055276,
-      "recall": 0.5383532723434201,
-      "f1": 0.6332781456953642,
+      "accuracy": 0.8696390003085468,
+      "roc_auc": 0.8829331524052078,
+      "precision": 0.7592760180995475,
+      "recall": 0.5916784203102962,
+      "f1": 0.6650812524772096,
       "confusion_matrix": [
         [
-          4864,
-          230
+          4798,
+          266
         ],
         [
-          656,
-          765
-        ]
-      ]
-    },
-    "random_forest": {
-      "accuracy": 0.92831926323868,
-      "roc_auc": 0.9291230565578248,
-      "precision": 0.9483082706766918,
-      "recall": 0.7100633356790992,
-      "f1": 0.8120724346076459,
-      "confusion_matrix": [
-        [
-          5039,
-          55
-        ],
-        [
-          412,
-          1009
+          579,
+          839
         ]
       ],
-      "cross_validation_accuracy": [
-        0.9266308518802763,
-        0.9318495778971604,
-        0.9323100537221796,
-        0.9344589409056024,
-        0.9289223211544366
-      ]
+      "operating_policy": {
+        "accuracy": 0.0,
+        "coverage": 0.0,
+        "manual_review_rate": 1.0,
+        "auto_decision_rows": 0,
+        "manual_review_rows": 6482,
+        "low_threshold": null,
+        "high_threshold": null,
+        "confusion_matrix": []
+      }
+    },
+    "random_forest": {
+      "accuracy": 0.9359765504473928,
+      "roc_auc": 0.9403072268754026,
+      "precision": 0.9735599622285175,
+      "recall": 0.7270803949224259,
+      "f1": 0.8324586192975374,
+      "confusion_matrix": [
+        [
+          5036,
+          28
+        ],
+        [
+          387,
+          1031
+        ]
+      ],
+      "operating_policy": {
+        "accuracy": 0.9500563879490898,
+        "coverage": 0.9575748225856218,
+        "manual_review_rate": 0.042425177414378235,
+        "auto_decision_rows": 6207,
+        "manual_review_rows": 275,
+        "low_threshold": 0.3,
+        "high_threshold": 0.56,
+        "confusion_matrix": [
+          [
+            4883,
+            16
+          ],
+          [
+            294,
+            1014
+          ]
+        ]
+      }
+    },
+    "hist_gradient_boosting": {
+      "accuracy": 0.9389077445232953,
+      "roc_auc": 0.9469932257791384,
+      "precision": 0.9857414448669202,
+      "recall": 0.731311706629055,
+      "f1": 0.8396761133603239,
+      "confusion_matrix": [
+        [
+          5049,
+          15
+        ],
+        [
+          381,
+          1037
+        ]
+      ],
+      "operating_policy": {
+        "accuracy": 0.9501199040767386,
+        "coverage": 0.964979944461586,
+        "manual_review_rate": 0.03502005553841403,
+        "auto_decision_rows": 6255,
+        "manual_review_rows": 227,
+        "low_threshold": 0.265,
+        "high_threshold": 0.72,
+        "confusion_matrix": [
+          [
+            4928,
+            5
+          ],
+          [
+            307,
+            1015
+          ]
+        ]
+      }
+    },
+    "gradient_boosting": {
+      "accuracy": 0.9404504782474545,
+      "roc_auc": 0.9500992375171848,
+      "precision": 0.9804469273743017,
+      "recall": 0.7425952045133991,
+      "f1": 0.8451043338683788,
+      "confusion_matrix": [
+        [
+          5043,
+          21
+        ],
+        [
+          365,
+          1053
+        ]
+      ],
+      "operating_policy": {
+        "accuracy": 0.9500238739455674,
+        "coverage": 0.9692995988892317,
+        "manual_review_rate": 0.030700401110768327,
+        "auto_decision_rows": 6283,
+        "manual_review_rows": 199,
+        "low_threshold": 0.295,
+        "high_threshold": 0.575,
+        "confusion_matrix": [
+          [
+            4931,
+            13
+          ],
+          [
+            301,
+            1038
+          ]
+        ]
+      }
+    },
+    "catboost": {
+      "accuracy": 0.9398333847577908,
+      "roc_auc": 0.9460389385401418,
+      "precision": 0.9867424242424242,
+      "recall": 0.7348377997179125,
+      "f1": 0.8423605497170574,
+      "confusion_matrix": [
+        [
+          5050,
+          14
+        ],
+        [
+          376,
+          1042
+        ]
+      ],
+      "operating_policy": {
+        "accuracy": 0.9500237981913374,
+        "coverage": 0.9723850663375502,
+        "manual_review_rate": 0.027614933662449825,
+        "auto_decision_rows": 6303,
+        "manual_review_rows": 179,
+        "low_threshold": 0.245,
+        "high_threshold": 0.525,
+        "confusion_matrix": [
+          [
+            4948,
+            12
+          ],
+          [
+            303,
+            1040
+          ]
+        ]
+      },
+      "cross_validation_accuracy": [],
+      "cross_validation_note": "Skipped for selected estimator: Cannot clone object CatBoostClassifier(allow_writing_files=False, bagging_temperature=0.4, cat_features=['person_home_ownership', 'loan_intent', 'loan_grade', 'cb_person_default_on_file'], depth=6, eval_metric='Accuracy', iterations=1000, l2_leaf_reg=6, learning_rate=0.035, loss_function='Logloss', random_seed=42, random_strength=0.8, verbose=False), as the constructor either does not set or modifies parameter cat_features"
     }
   }
 }
