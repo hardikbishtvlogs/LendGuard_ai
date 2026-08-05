@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 import joblib
+import numpy as np
 import pandas as pd
 from ..core.config import get_settings
 
@@ -121,6 +122,38 @@ def risk_analysis(data, probability: float, loan_pct: float) -> dict:
     return {"top_drivers": primary, "positive_signals": positives, "score_components": components}
 
 
+def catboost_explanations(bundle: dict, row: pd.DataFrame) -> dict:
+    """Return real per-decision SHAP values when the deployed model is CatBoost.
+
+    CatBoost calculates exact TreeSHAP values internally, so no surrogate model or
+    heuristic is used for this part of the response.
+    """
+    if bundle.get("model_name") != "catboost":
+        return {"shap_values": [], "feature_importance": []}
+    try:
+        from catboost import Pool
+        features = bundle["pipeline"].named_steps["features"].transform(row)
+        classifier = bundle["pipeline"].named_steps["classifier"]
+        categories = features.select_dtypes(include=["object", "string"]).columns.tolist()
+        category_positions = [features.columns.get_loc(name) for name in categories]
+        pool = Pool(features, cat_features=category_positions)
+        values = classifier.get_feature_importance(pool, type="ShapValues")[0]
+        names = features.columns.tolist()
+        contributions = sorted(
+            ({"feature": name, "value": round(float(value), 6), "direction": "increases_risk" if value >= 0 else "reduces_risk"}
+             for name, value in zip(names, values[:-1])), key=lambda item: abs(item["value"]), reverse=True
+        )[:8]
+        importance = sorted(
+            ({"feature": name, "importance": round(float(value), 4)}
+             for name, value in zip(names, classifier.get_feature_importance(type="FeatureImportance"))),
+            key=lambda item: item["importance"], reverse=True
+        )[:12]
+        return {"base_value": round(float(values[-1]), 6), "shap_values": contributions, "feature_importance": importance}
+    except Exception:
+        # Scoring must remain available if an optional explanation computation fails.
+        return {"shap_values": [], "feature_importance": []}
+
+
 def predict(data) -> dict:
     bundle = load_bundle()
     loan_pct = data.loan_amount / data.income
@@ -142,6 +175,8 @@ def predict(data) -> dict:
     decision = "reject" if risk == "high" else "manual_review" if risk == "medium" else "approve"
     confidence = max(probability, 1 - probability)
     recommendation = {"approve": "Approve under standard policy", "manual_review": "Request enhanced affordability review", "reject": "Decline or require additional security"}[decision]
+    explanation = risk_analysis(data, probability, loan_pct)
+    explanation.update(catboost_explanations(bundle, row))
     return {"default_probability": round(probability, 6), "risk_score": round(probability * 1000),
             "confidence": round(confidence * 100, 2), "risk_category": risk,
-            "recommendation": recommendation, "explanation": risk_analysis(data, probability, loan_pct), "decision": decision}
+            "recommendation": recommendation, "explanation": explanation, "decision": decision}

@@ -8,10 +8,10 @@ from reportlab.pdfgen.canvas import Canvas
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from ..core.database import get_db
-from ..core.security import create_token, current_user, hash_password, verify_password
+from ..core.security import create_token, current_user, hash_password, require_roles, verify_password
 from ..models.entities import Customer, Prediction, User
 from ..schemas.api import AssessmentOut, CustomerIn, CustomerOut, LoanApplication, PredictionOut, Register, Token, UserOut
-from ..services.ml import predict
+from ..services.ml import load_bundle, predict
 from ..services.powerbi import push_prediction
 
 router = APIRouter(prefix="/api/v1")
@@ -84,6 +84,37 @@ def dashboard(db: Session = Depends(get_db), user=Depends(current_user)):
             "average_default_probability": round(sum(x.default_probability for x in rows) / total, 4) if total else 0}
 
 
+@router.get("/analytics")
+def analytics(db: Session = Depends(get_db), user=Depends(current_user)):
+    q = db.query(Prediction)
+    if user.role == "customer":
+        q = q.filter(Prediction.user_id == user.id)
+    rows = q.order_by(Prediction.created_at.asc()).all()
+    monthly: dict[str, dict] = {}
+    for row in rows:
+        month = row.created_at.strftime("%Y-%m")
+        bucket = monthly.setdefault(month, {"month": month, "predictions": 0, "approved": 0, "rejected": 0, "avg_default_probability": 0.0})
+        bucket["predictions"] += 1
+        bucket["approved"] += int(row.decision == "approve")
+        bucket["rejected"] += int(row.decision == "reject")
+        bucket["avg_default_probability"] += row.default_probability
+    for bucket in monthly.values():
+        bucket["avg_default_probability"] = round(bucket["avg_default_probability"] / bucket["predictions"], 4)
+    return {"monthly_trends": list(monthly.values()), "total_predictions": len(rows)}
+
+
+@router.get("/model/insights")
+def model_insights(user=Depends(current_user)):
+    bundle = load_bundle()
+    return {"model_name": bundle.get("model_name"), "metrics": bundle.get("metrics", {}),
+            "feature_columns": bundle.get("feature_columns", []), "decision_thresholds": bundle.get("decision_thresholds", {})}
+
+
+@router.get("/admin/users", response_model=list[UserOut])
+def list_users(db: Session = Depends(get_db), user=Depends(require_roles("admin"))):
+    return db.query(User).order_by(User.created_at.desc()).limit(500).all()
+
+
 def report_rows(db, user):
     q = db.query(Prediction)
     return (q if user.role != "customer" else q.filter(Prediction.user_id == user.id)).order_by(Prediction.created_at.desc()).all()
@@ -96,6 +127,14 @@ def excel_report(db: Session = Depends(get_db), user=Depends(current_user)):
     for x in report_rows(db, user): ws.append([x.id, x.created_at.isoformat(), x.default_probability, x.risk_category, x.risk_score, x.decision])
     stream = BytesIO(); wb.save(stream)
     return Response(stream.getvalue(), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": "attachment; filename=loan-risk-report.xlsx"})
+
+
+@router.get("/reports/csv")
+def csv_report(db: Session = Depends(get_db), user=Depends(current_user)):
+    lines = ["id,created_at,default_probability,risk_category,risk_score,confidence,decision"]
+    for x in report_rows(db, user):
+        lines.append(f"{x.id},{x.created_at.isoformat()},{x.default_probability},{x.risk_category},{x.risk_score},{x.confidence},{x.decision}")
+    return Response("\n".join(lines) + "\n", media_type="text/csv", headers={"Content-Disposition": "attachment; filename=loan-risk-report.csv"})
 
 
 @router.get("/reports/pdf")

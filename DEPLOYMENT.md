@@ -56,6 +56,23 @@ cd "/Users/hardikbisht/Documents/LOAN"
 
 Open `http://localhost:3100`.
 
+## Single-host Docker deployment
+
+1. Copy `.env.example` to `.env`; set `ENVIRONMENT=production`, a cryptographically random `SECRET_KEY`, `POSTGRES_PASSWORD`, `CORS_ORIGINS`, and `TRUSTED_HOSTS`.
+2. Point your DNS A/AAAA record to the server.
+3. Start the complete PostgreSQL, FastAPI, Next.js and Nginx stack:
+
+```bash
+docker compose -f docker-compose.production.yml up -d --build
+docker compose -f docker-compose.production.yml ps
+```
+
+Nginx is the only public service and listens on port 80. Put a managed HTTPS load balancer in front of it, or terminate TLS with your hosting provider. Set `CORS_ORIGINS` and `TRUSTED_HOSTS` to the final HTTPS domain before going live.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` installs the pinned dependencies, runs the backend tests, builds the frontend, and builds containers on each pull request and push to `main`. Configure a deployment hook (Render deploy hook, Railway service token, or AWS OIDC role) as a GitHub Actions secret; keep that provider-specific credential out of the repository.
+
 ## Cloud Hosting
 
 Recommended split:

@@ -12,11 +12,16 @@ class Settings(BaseSettings):
     powerbi_push_url: str | None = None
     powerbi_embed_url: str | None = None
     cors_origins: str = "http://localhost:3000,http://localhost:3100,http://127.0.0.1:3100"
+    trusted_hosts: str = "localhost,127.0.0.1"
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
     def origins(self) -> list[str]:
         return [x.strip() for x in self.cors_origins.split(",") if x.strip()]
+
+    @property
+    def hosts(self) -> list[str]:
+        return [x.strip() for x in self.trusted_hosts.split(",") if x.strip()]
 
 
 @lru_cache

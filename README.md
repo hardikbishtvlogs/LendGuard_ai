@@ -84,7 +84,7 @@ source .venv/bin/activate
 python ml/train.py
 ```
 
-Training compares Logistic Regression, Random Forest, gradient boosting and CatBoost when available. It evaluates accuracy, ROC AUC, precision, recall, F1 and confusion matrix, then refuses to save a model unless automated decisions meet the 95%+ operating accuracy gate with at least 90% auto-decision coverage.
+Training compares Logistic Regression, Random Forest, HistGradientBoosting, GradientBoosting, XGBoost, LightGBM, and CatBoost. It evaluates accuracy, ROC AUC, precision, recall, F1 and confusion matrix, then refuses to save a model unless automated decisions meet the 95%+ operating accuracy gate with at least 90% auto-decision coverage.
 
 ## Power BI
 
@@ -103,10 +103,10 @@ cd frontend && npm run build
 
 - Replace `SECRET_KEY` and keep it in a secrets manager.
 - Use managed PostgreSQL with backups, TLS, migrations, connection pooling, and least-privilege credentials.
-- Add Microsoft Entra embed-token flow for Power BI.
+- Configure Microsoft Entra embed-token flow for Power BI (the secure service-principal procedure is documented in `powerbi/README.md`).
 - Put Nginx or a cloud load balancer in front of the services and enforce HTTPS.
 - Add rate limiting, refresh-token rotation, email verification, MFA, audit-event retention, consent and jurisdiction-specific lending compliance.
-- Deploy frontend to Vercel and backend/container to AWS or Render; the included Dockerfiles and CI workflow are starting points.
+- Set the required GitHub repository secrets and deploy from the included CI workflow.
 
 ## Structure
 

@@ -6,6 +6,7 @@ export default function config(phase:string):NextConfig{
   // Keep dev chunks isolated so a production build cannot corrupt a running server.
   distDir: phase===PHASE_DEVELOPMENT_SERVER?".next-dev":".next",
   output:"standalone",
-  env:{NEXT_PUBLIC_API_URL:process.env.NEXT_PUBLIC_API_URL||"http://localhost:8000"}
+  // An explicitly empty value uses the same-origin /api/v1 proxy in production.
+  env:{NEXT_PUBLIC_API_URL:process.env.NEXT_PUBLIC_API_URL??"http://localhost:8000"}
  };
 }

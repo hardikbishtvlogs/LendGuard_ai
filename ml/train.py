@@ -12,6 +12,8 @@ from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_f
 from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
 
 ROOT = Path(__file__).parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
@@ -158,6 +160,18 @@ def main():
             ("preprocessor", preprocessor(X_train, dense=True)),
             ("classifier", GradientBoostingClassifier(random_state=42, n_estimators=500,
                                                       learning_rate=.05, max_depth=4, subsample=.9)),
+        ]),
+        "xgboost": Pipeline([
+            ("preprocessor", preprocessor(X_train)),
+            ("classifier", XGBClassifier(n_estimators=650, max_depth=5, learning_rate=.035,
+                                          subsample=.9, colsample_bytree=.85, reg_lambda=2.0,
+                                          eval_metric="logloss", random_state=42, n_jobs=-1)),
+        ]),
+        "lightgbm": Pipeline([
+            ("preprocessor", preprocessor(X_train)),
+            ("classifier", LGBMClassifier(n_estimators=650, num_leaves=31, learning_rate=.035,
+                                           subsample=.9, colsample_bytree=.85, reg_lambda=2.0,
+                                           random_state=42, n_jobs=-1, verbosity=-1)),
         ]),
     }
     catboost = catboost_candidate(X_train)
