@@ -14,7 +14,9 @@ services:
       - key: MODEL_PATH
         value: /ml/artifacts/model.joblib
       - key: CORS_ORIGINS
-        value: https://lendguard-ai-web.onrender.com
+        value: https://lendguard-ai-web.onrender.com,https://lendguard-ai.vercel.app
+      - key: TRUSTED_HOSTS
+        value: lendguard-ai-api.onrender.com,*.onrender.com,localhost,127.0.0.1
       - key: POWERBI_PUSH_URL
         value: ""
       - key: POWERBI_EMBED_URL
