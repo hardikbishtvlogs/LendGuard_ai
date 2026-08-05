@@ -30,6 +30,7 @@ services:
     plan: free
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: .
+    healthCheckPath: /
     envVars:
       - key: NEXT_PUBLIC_API_URL
         value: https://lendguard-ai-api.onrender.com
